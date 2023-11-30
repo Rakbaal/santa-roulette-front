@@ -1,25 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './App.css';
+import Login from './pages/login/login';
+import UserPage from './pages/userPage/userPage';
+import { useEffect, useState } from 'react';
+import { Participant } from './models/participant';
+import UserContext from './components/contexts/userContext';
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: localStorage.getItem("user") ? <UserPage /> : <Login />
+  },
+  {
+    path: "/login",
+    element: <Login />
+  },
+  {
+    path: "/user-page",
+    element: <UserPage />
+  },
+])
+
+const storedUser = localStorage.getItem("user")
+const parsedUser = storedUser ? JSON.parse(storedUser) : new Participant()
 
 function App() {
+  const [user, setUser] = useState<Participant>(new Participant(parsedUser.id, parsedUser.pseudo, parsedUser.famille))
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={{ user, setUser }}>
+      <div className="App">
+        <div className='bg-img'/>
+        <RouterProvider router={router} />
+      </div>
+    </UserContext.Provider>
   );
 }
 
